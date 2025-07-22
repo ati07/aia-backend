@@ -1,6 +1,6 @@
 import { Router } from "express";
 import auth from "../middleware/auth.js";
-import { createAccountPayable, deleteAccountPayable, getAccountPayable, updateAccountPayable } from "../controllers/AccountPayable.js";
+import { createAccountPayable, deleteAccountPayable, getAccountPayable, updateAccountPayable } from "../controllers/accountPayable.js";
 import logUserAction from "../middleware/logUserAction.js";
 
 const AccountPayableRouter = Router();
