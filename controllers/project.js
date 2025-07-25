@@ -8,7 +8,7 @@ export const createProject= tryCatch(async (req, res) => {
 
   let ProjectPayload = req.body
   ProjectPayload.addedBy = req.auth.user._id
-  ProjectPayload.reminder = ProjectPayload.budget // Assuming reminder is the same as budget, adjust as needed
+  ProjectPayload.remainder = ProjectPayload.budget // Assuming reminder is the same as budget, adjust as needed
 
   const newProject= new Project(ProjectPayload);
 
