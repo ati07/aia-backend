@@ -1,5 +1,6 @@
 import Bills from '../models/bills.js';
 import tryCatch from './utils/tryCatch.js';
+import Project from '../models/project.js';
 
 // create Client
 export const createBills= tryCatch(async (req, res) => {
@@ -9,6 +10,23 @@ export const createBills= tryCatch(async (req, res) => {
   let BillsPayload = req.body
   BillsPayload.addedBy = req.auth.user._id
   
+  let findData = {
+    _id: req.body.projectId
+  }
+
+  let ProjectsData = await Project.find(findData).sort({ name: 1 });
+
+  let remainder = parseFloat(ProjectsData[0].budget) - parseFloat(req.body.amount);
+
+  ProjectsData.remainder = remainder.toString(); // Assuming reminder is the same as budget, adjust as needed
+
+
+  const updatedProject = await Project.updateOne(findData,{ $set: { remainder: remainder.toString() } })
+
+  if (!updatedProject) {
+    return res.status(400).json({ success: false, message: 'Failed to update project reminder' });
+  }
+
   const newBills= new Bills(BillsPayload);
 
   await newBills.save()
@@ -27,12 +45,23 @@ export const getBills= tryCatch(async (req, res) => {
     findData['projectId'] = req.query.projectId
   }
 
-  if (req.query.date) {
-    const start = new Date(req.query.date);
-    const end = new Date(req.query.date);
-    end.setDate(end.getDate() + 1);
+  // if (req.query.date) {
+  //   const start = new Date(req.query.date);
+  //   const end = new Date(req.query.date);
+  //   end.setDate(end.getDate() + 1);
 
-    findData['date'] = { $gte: start, $lt: end };
+  //   findData['date'] = { $gte: start, $lt: end };
+  // }
+  if (req.query.from) {
+    const from = new Date(req.query.from);
+    const end = new Date(req.query.from);
+    end.setDate(end.getDate() + 1);
+    let dateFilter = { $gte: from, $lte: end };
+    if (req.query.to && req.query.to.trim() !== "") {
+      const to = new Date(req.query.to);
+      dateFilter.$lte = to;
+    }
+    findData['date'] = dateFilter;
   }
 
   const Bill = await Bills.find(findData).populate([

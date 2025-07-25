@@ -7,6 +7,7 @@ const projectSchema = new mongoose.Schema({
     startDate: { type: Date },
     estimatedCompletion: { type: Date },
     budget: { type: String },
+    remainder: { type: String },
     description: { type: String },
     isDelete:{ type: Boolean, default: false },
     isActive:{ type: Boolean, default: true }, 

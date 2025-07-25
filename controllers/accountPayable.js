@@ -37,6 +37,7 @@ export const getAccountPayable= tryCatch(async (req, res) => {
 
   const AccountPayables = await AccountPayable.find(findData).populate([
     { path: 'addedBy', model: 'users' },
+    { path:'projectId',model: 'projects' },
     // { path: 'userId', model: 'users' },
     { path:'providerId',model: 'providers' }]).sort({ _id: -1 });
 
