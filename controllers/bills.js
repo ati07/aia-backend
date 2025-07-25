@@ -16,7 +16,7 @@ export const createBills= tryCatch(async (req, res) => {
 
   let ProjectsData = await Project.find(findData).sort({ name: 1 });
 
-  let remainder = parseFloat(ProjectsData[0].budget) - parseFloat(req.body.amount);
+  let remainder = parseFloat(ProjectsData[0].remainder) - parseFloat(req.body.amount);
 
   ProjectsData.remainder = remainder.toString(); // Assuming reminder is the same as budget, adjust as needed
 
