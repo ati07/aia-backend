@@ -29,18 +29,27 @@ export const getProject= tryCatch(async (req, res) => {
 
   // Calculate remainder for each project
   Projects = await Promise.all(
-    Projects.map(async (project) => {
-      const bills = await Bills.aggregate([
-        { $match: { projectId: project._id, isDelete: false } },
-        { $group: { _id: null, total: { $sum: "$amount" } } }
-      ]);
-      const totalBills = bills.length > 0 ? bills[0].total : 0;
-      // Ensure budget is a number
-      const budget = parseFloat(project.budget);
-      project.remainder = (budget - totalBills).toString();
-      return project;
-    })
-  );
+  Projects.map(async (project) => {
+    const bills = await Bills.aggregate([
+      { $match: { projectId: project._id, isDelete: false } },
+      {
+        $addFields: {
+          amountNum: { $toDouble: "$amount" }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$amountNum" }
+        }
+      }
+    ]);
+    const totalBills = bills.length > 0 ? bills[0].total : 0;
+    const budget = parseFloat(project.budget);
+    project.remainder = (budget - totalBills).toString();
+    return project;
+  })
+);
 
 
 
