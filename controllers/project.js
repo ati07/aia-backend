@@ -1,5 +1,6 @@
 import Project from '../models/project.js';
 import tryCatch from './utils/tryCatch.js';
+import Bills from '../models/bills.js';
 
 // create Client
 export const createProject= tryCatch(async (req, res) => {
@@ -24,7 +25,24 @@ export const getProject= tryCatch(async (req, res) => {
     isDelete: false
   }
 
-  const Projects = await Project.find(findData).populate([{ path: 'addedBy', model: 'users' }]).sort({ name: 1 });
+  let Projects = await Project.find(findData).populate([{ path: 'addedBy', model: 'users' }]).sort({ name: 1 });
+
+  // Calculate remainder for each project
+  Projects = await Promise.all(
+    Projects.map(async (project) => {
+      const bills = await Bills.aggregate([
+        { $match: { projectId: project._id, isDelete: false } },
+        { $group: { _id: null, total: { $sum: "$amount" } } }
+      ]);
+      const totalBills = bills.length > 0 ? bills[0].total : 0;
+      // Ensure budget is a number
+      const budget = parseFloat(project.budget);
+      project.remainder = (budget - totalBills).toString();
+      return project;
+    })
+  );
+
+
 
   res.status(200).json({ success: true, result: Projects});
 });

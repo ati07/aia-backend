@@ -10,22 +10,22 @@ export const createBills= tryCatch(async (req, res) => {
   let BillsPayload = req.body
   BillsPayload.addedBy = req.auth.user._id
   
-  let findData = {
-    _id: req.body.projectId
-  }
+  // let findData = {
+  //   _id: req.body.projectId
+  // }
 
-  let ProjectsData = await Project.find(findData).sort({ name: 1 });
+  // let ProjectsData = await Project.find(findData).sort({ name: 1 });
 
-  let remainder = parseFloat(ProjectsData[0].remainder) - parseFloat(req.body.amount);
+  // let remainder = parseFloat(ProjectsData[0].remainder) - parseFloat(req.body.amount);
 
-  ProjectsData.remainder = remainder.toString(); // Assuming reminder is the same as budget, adjust as needed
+  // ProjectsData.remainder = remainder.toString(); // Assuming reminder is the same as budget, adjust as needed
 
 
-  const updatedProject = await Project.updateOne(findData,{ $set: { remainder: remainder.toString() } })
+  // const updatedProject = await Project.updateOne(findData,{ $set: { remainder: remainder.toString() } })
 
-  if (!updatedProject) {
-    return res.status(400).json({ success: false, message: 'Failed to update project reminder' });
-  }
+  // if (!updatedProject) {
+  //   return res.status(400).json({ success: false, message: 'Failed to update project reminder' });
+  // }
 
   const newBills= new Bills(BillsPayload);
 
